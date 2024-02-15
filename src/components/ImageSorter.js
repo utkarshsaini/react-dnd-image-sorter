@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { DndProvider} from 'react-dnd';
+import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
+
 import update from 'immutability-helper';
 
 import Card from './Card';
@@ -28,26 +29,36 @@ const ImageSorter = () => {
         order: imagesOrder[index]
     })));
 
+    const handleSave = () => {
+        setImages(images.map((image, index) => ({ ...image, order: index + 1 })));
+    };
+
     const moveImage = (dragIndex, hoverIndex) => {
         const dragImage = images[dragIndex];
-        setImages(update(images, {
-            $splice: [
-                [dragIndex, 1],
-                [hoverIndex, 0, dragImage]
-            ],
-        }));
+        setImages(
+            update(images, {
+                $splice: [
+                    [dragIndex, 1],
+                    [hoverIndex, 0, dragImage]
+                ],
+            })
+        );
     };
-    
+
+    console.log(images);
     console.log(images.map(image => image.order).join(', '));
 
     return (
         <div>
             <h1>Image Sorter</h1>
+            <button onClick={handleSave}>Save</button>
             <p>Current order: {images.map(image => image.order).join(', ')}</p>
             <DndProvider backend={HTML5Backend}>
-                {images.map((image, index) => (
-                    <Card key={index} id={index} url={image.url} moveImage={moveImage} />
-                ))}
+                <div style={{ height: '300px', overflow: 'auto' }}>
+                    {images.map((image, index) => (
+                        <Card key={index} id={index} url={image.url} order={image.order} moveImage={moveImage} />
+                    ))}
+                </div>
             </DndProvider>
         </div>
     );
